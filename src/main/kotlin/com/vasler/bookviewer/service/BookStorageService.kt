@@ -100,17 +100,18 @@ class BookStorageService
     fun createRedisKey(username: String, isbn: String, normalized: Boolean = false)
             = "PDF-$username-${if (!normalized) ISBNUtil.normalize(isbn) ?: throw Exception("INVALID ISBN") else isbn}"
 
-    data class BookList(var firstItemIndex: Int, var pageSize: Int, val books: List<String>)
+    data class BookListMetadata(var isbn: String, var pageCount: Int)
+    data class BookList(var firstItemIndex: Int, var pageSize: Int, val books: List<BookListMetadata>)
 
     fun listBooks(username: String, offset: Int, limit: Int = 50): BookList
     {
-        val books = mutableListOf<String>()
+        val books = mutableListOf<BookListMetadata>()
 
         val validatedOffset = if (offset < 0) 0 else offset
         val validatedLimit = if (limit !in 1..100) 100 else limit
 
         getConnection().use { conn ->
-            val ps = conn.prepareStatement("SELECT isbn FROM $SCHM.book WHERE user_id = " +
+            val ps = conn.prepareStatement("SELECT isbn, page_count FROM $SCHM.book WHERE user_id = " +
                     "(SELECT id FROM $SCHM.user WHERE username = ?) ORDER BY creation_ts LIMIT ? OFFSET ?")
 
             ps.setString(1, username)
@@ -118,7 +119,7 @@ class BookStorageService
             ps.setInt(3, validatedOffset)
 
             val rs = ps.executeQuery()
-            while (rs.next())   books.add(rs.getString(1))
+            while (rs.next())   books.add(BookListMetadata(rs.getString(1), rs.getInt(2)))
 
             conn.rollback();
         }
