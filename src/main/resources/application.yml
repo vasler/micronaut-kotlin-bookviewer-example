@@ -1,0 +1,82 @@
+micronaut:
+  application:
+    name: bookviewer
+  server:
+    host: localhost
+    max-request-size: '20MB'
+    multipart:
+      max-file-size: '20MB'
+  security:
+    enabled: true
+    endpoints:
+      login:
+        enabled: true
+#    redirect:
+#      unauthorized:
+#        enabled: true
+#        url: /login
+    authentication: bearer
+    token:
+      jwt:
+        signatures:
+          secret:
+            generator:
+              secret: '"${JWT_GENERATOR_SIGNATURE_SECRET:pleaseChangeThisSecretForANewOne}"'
+        enabled: true
+        generator:
+          refresh-token:
+            enabled: true
+  executors:
+    pdfprocessor:
+      type: work_stealing
+#      type: fixed
+#      number-of-threads: 4
+#    port: 8080
+
+endpoints:
+  health:
+    enabled: true
+    sensitive: false
+    details-visible: ANONYMOUS
+  flyway:
+    enable: true
+    sensitive: false
+
+datasources:
+  default:
+    url: jdbc:postgresql://localhost:5432/bookviewer
+    driverClassName: org.postgresql.Driver
+    username: bookviewer
+    password: '123bookviewer123'
+
+flyway:
+  datasources:
+    default:
+#      locations:
+#        - classpath: db/migrations
+      enabled: true
+#      schemas: BOOKVIEWER
+#      default-schema: BOOKVIEWER
+      schemas: bookviewer
+      default-schema: bookviewer
+
+redis:
+  uri: redis://localhost
+  timeout: 100ms
+  caches:
+    default:
+      expiration-after-write-policy: com.vasler.bookviewer.service.CachePolicy
+#      value-serializer: com.vasler.bookviewer.util.BinaryRedisSerializer
+      value-serializer: io.micronaut.jackson.serialize.JacksonObjectSerializer
+
+bookviewer:
+#  MAXIMUM NUMBER OF WORKERS AVAILABLE FOR PAGE RENDERING
+  maxWorkers: 8
+#  MAXIMUM BOOK RENDERING RETRY COUNT IN CAUSE OF ERROR
+  maxProcessingRetryCount: 10
+#  RENDERING RETRY INTERVAL (IN SECONDS) IN CAUSE OF ERROR
+  processingRetryInterval: 10
+#  JWT SECRET KEY
+  pageJwtKey: W3ta2OKep3/CcMCu73IRVSeFX+cZN0N9dJy4IV2IV9vi2wlObEp0hTMbz8bMM/d1d6CDncnWagr9ry8OHErsPg==
+
+#redis.uri: redis://localhost

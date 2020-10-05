@@ -1,0 +1,7 @@
+applicationType: default
+defaultPackage: com.vasler.bookviewer
+testFramework: kotest
+sourceLanguage: kotlin
+buildTool: gradle
+#features: [annotation-api, app-name, data, data-jdbc, docker, file-watch, flyway, graalvm, gradle, graphql, http-client, jdbc-hikari, jib, kotest, kotlin, kotlin-application, kotlin-extension-functions, log4j2, netty-server, postgres, readme, redis-lettuce, security-annotations, security-jwt, sql-jdbi, testcontainers, yaml]
+features: [annotation-api, app-name, data, data-jdbc, docker, file-watch, flyway, graalvm, gradle, graphql, http-client, jdbc-hikari, jib, junit, kotlin, kotlin-application, kotlin-extension-functions, log4j2, netty-server, postgres, readme, redis-lettuce, security-annotations, security-jwt, sql-jdbi, testcontainers, yaml]
